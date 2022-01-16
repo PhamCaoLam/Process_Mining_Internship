@@ -1,0 +1,27 @@
+digraph {
+	graph [rankdir=LR]
+	"receive order and photo" [shape=square]
+	p1 [shape=circle]
+	"receive order and photo" -> p1
+	p1 [shape=circle]
+	"design photo poster" [shape=square]
+	p1 -> "design photo poster"
+	"design photo poster" [shape=square]
+	p2 [shape=circle]
+	"design photo poster" -> p2
+	p2 [shape=circle]
+	"print poster" [shape=square]
+	p2 -> "print poster"
+	"print poster" [shape=square]
+	p3 [shape=circle]
+	"print poster" -> p3
+	p3 [shape=circle]
+	"deliver poster" [shape=square]
+	p3 -> "deliver poster"
+	iL [shape=circle]
+	"receive order and photo" [shape=square]
+	iL -> "receive order and photo"
+	oL [shape=circle]
+	"deliver poster" [shape=square]
+	"deliver poster" -> oL
+}

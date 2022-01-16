@@ -1,0 +1,63 @@
+digraph {
+	graph [rankdir=LR]
+	"register request" [shape=square]
+	p1 [shape=circle]
+	"register request" -> p1
+	p1 [shape=circle]
+	"check ticket" [shape=square]
+	p1 -> "check ticket"
+	"check ticket" [shape=square]
+	p2 [shape=circle]
+	"check ticket" -> p2
+	p2 [shape=circle]
+	decide [shape=square]
+	p2 -> decide
+	"reinitiate request" [shape=square]
+	p3 [shape=circle]
+	"reinitiate request" -> p3
+	p3 [shape=circle]
+	"check ticket" [shape=square]
+	p3 -> "check ticket"
+	decide [shape=square]
+	p4 [shape=circle]
+	decide -> p4
+	p4 [shape=circle]
+	"reinitiate request" [shape=square]
+	p4 -> "reinitiate request"
+	p4 [shape=circle]
+	"pay compensation" [shape=square]
+	p4 -> "pay compensation"
+	p4 [shape=circle]
+	"reject request" [shape=square]
+	p4 -> "reject request"
+	"register request" [shape=square]
+	p5 [shape=circle]
+	"register request" -> p5
+	"reinitiate request" [shape=square]
+	p5 [shape=circle]
+	"reinitiate request" -> p5
+	p5 [shape=circle]
+	"examine casually" [shape=square]
+	p5 -> "examine casually"
+	p5 [shape=circle]
+	"examine thoroughly" [shape=square]
+	p5 -> "examine thoroughly"
+	"examine casually" [shape=square]
+	p6 [shape=circle]
+	"examine casually" -> p6
+	"examine thoroughly" [shape=square]
+	p6 [shape=circle]
+	"examine thoroughly" -> p6
+	p6 [shape=circle]
+	decide [shape=square]
+	p6 -> decide
+	iL [shape=circle]
+	"register request" [shape=square]
+	iL -> "register request"
+	oL [shape=circle]
+	"pay compensation" [shape=square]
+	"pay compensation" -> oL
+	oL [shape=circle]
+	"reject request" [shape=square]
+	"reject request" -> oL
+}

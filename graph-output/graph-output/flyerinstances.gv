@@ -1,0 +1,27 @@
+digraph {
+	graph [rankdir=LR]
+	"receive flyer order" [shape=square]
+	p1 [shape=circle]
+	"receive flyer order" -> p1
+	p1 [shape=circle]
+	"design flyer" [shape=square]
+	p1 -> "design flyer"
+	"send draft to customer" [shape=square]
+	p2 [shape=circle]
+	"send draft to customer" -> p2
+	p2 [shape=circle]
+	"print flyer" [shape=square]
+	p2 -> "print flyer"
+	"print flyer" [shape=square]
+	p3 [shape=circle]
+	"print flyer" -> p3
+	p3 [shape=circle]
+	"deliver flyer" [shape=square]
+	p3 -> "deliver flyer"
+	iL [shape=circle]
+	"receive flyer order" [shape=square]
+	iL -> "receive flyer order"
+	oL [shape=circle]
+	"deliver flyer" [shape=square]
+	"deliver flyer" -> oL
+}

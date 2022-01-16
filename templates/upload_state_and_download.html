@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+    {% block title %}
+    <title>Model result</title>
+    {% endblock title %}
+    {% block content %}
+    <br>
+    <h4>Thank you ! Your file has been uploaded and a corresponding model has been created for you!</h4>
+    <br><br>
+    <a href="{{url_for('display', filepath=file_path)}}" class="btn btn-sm btn-success">Display the model</a>
+    <a href="{{url_for('download', filepath=file_path)}}" class="btn btn-sm btn-primary">Download file of model</a>
+    {% endblock %}

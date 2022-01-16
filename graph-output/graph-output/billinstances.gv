@@ -1,0 +1,18 @@
+digraph {
+	graph [rankdir=LR]
+	"deliver bill" [shape=square]
+	"print bill" [shape=square]
+	"write bill" [shape=square]
+	"print bill" [shape=circle]
+	"print bill" -> p1
+	p1 [shape=circle]
+	p1 -> "deliver bill"
+	"write bill" [shape=circle]
+	"write bill" -> p2
+	p2 [shape=circle]
+	p2 -> "print bill"
+	iL [shape=circle]
+	iL -> "write bill"
+	"deliver bill" [shape=circle]
+	"deliver bill" -> oL
+}

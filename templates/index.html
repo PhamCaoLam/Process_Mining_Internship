@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+    {% block title%}
+        <title>Home Page</title>
+    {% endblock %}
+    {% block content %}
+        <br>
+        <h4>Please upload an event log file (.XES format)</h4>
+        <br><br>
+        <div>
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" class="form-control-file" name="filename">
+                    <button type="submit" name="submit" class="btn btn-outline-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    {% endblock %}

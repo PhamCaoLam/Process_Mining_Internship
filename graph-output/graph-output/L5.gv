@@ -1,0 +1,45 @@
+digraph {
+	graph [rankdir=LR]
+	a [shape=square]
+	p1 [shape=circle]
+	a -> p1
+	p1 [shape=circle]
+	e [shape=square]
+	p1 -> e
+	e [shape=square]
+	p2 [shape=circle]
+	e -> p2
+	p2 [shape=circle]
+	f [shape=square]
+	p2 -> f
+	c [shape=square]
+	p3 [shape=circle]
+	c -> p3
+	p3 [shape=circle]
+	d [shape=square]
+	p3 -> d
+	b [shape=square]
+	p4 [shape=circle]
+	b -> p4
+	p4 [shape=circle]
+	c [shape=square]
+	p4 -> c
+	p4 [shape=circle]
+	f [shape=square]
+	p4 -> f
+	a [shape=square]
+	p5 [shape=circle]
+	a -> p5
+	d [shape=square]
+	p5 [shape=circle]
+	d -> p5
+	p5 [shape=circle]
+	b [shape=square]
+	p5 -> b
+	iL [shape=circle]
+	a [shape=square]
+	iL -> a
+	oL [shape=circle]
+	f [shape=square]
+	f -> oL
+}
