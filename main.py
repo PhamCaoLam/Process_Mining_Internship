@@ -19,15 +19,15 @@ class AlphaMiner(object):
 
 
 
-    # Step1 : print out all the present activity names in the event log
+    # Step1 : returns all present activity names in the event log
     def step_1_TL(self):
-        # empty list holding names of all present event.
+        # empty list holding all present event names.
         TL = []
         # take every trace from the event log
         for trace in self.event_log:
             # traverse every event within a trace
             for i in range(len(trace)):
-                # in each event, get access to the activity name
+                # in each event, get access to its activity name
                 name = trace[i]['concept:name']
                 # add the activity name to the list if not yet present
                 if name not in TL:
@@ -35,7 +35,7 @@ class AlphaMiner(object):
         return TL
 
 
-    # Step 2: return the start activity names
+    # Step 2: returns names of all start nodes
     def step_2_TI(self):
         # create an empty set for start activities name
         start_acts = []
@@ -49,7 +49,7 @@ class AlphaMiner(object):
 
 
 
-    # Step 3: returns names of final activity nodes:
+    # Step 3: returns names of all final activity nodes
     def step_3_TO(self):
         # create an empty set for final activities name
         final_acts = []
@@ -61,7 +61,7 @@ class AlphaMiner(object):
                 final_acts.append(final_act)
         return final_acts
 
-    # create a list of element pairs with follow relations
+    # create a list of all pairs of event names with follow relations
     def give_follow_pairs(self):
         follow_pairs = []
         # take every trace from the event log
@@ -71,10 +71,42 @@ class AlphaMiner(object):
                 # in each event, get access to the activity name
                 event_name1 = trace[i]['concept:name']
                 event_name2 = trace[i + 1]['concept:name']
-                if (event_name1, event_name2) not in follow_pairs:
+                # we consider only pairs with event_name1 != event_name2 (event transition ignored)
+                # (for ex: flyerinstances.xes have events of the same activity but of different transitions.
+                if (event_name1, event_name2) not in follow_pairs and event_name1 != event_name2:
                     follow_pairs.append((event_name1, event_name2))
         return follow_pairs
 
+    # This function returns the relation status between 2 certain event names
+    def get_relation_status_of(self, event_name1, event_name2):
+        return self.relations[event_name1][event_name2]
+
+    # This function returns a list of all independent pairs
+    def give_independent_pairs(self):
+        pairs = list()
+        follows = self.follow_pairs
+        # create a list of combinations holding all pairs of event names.
+        combinations = list(itertools.combinations(self.step_1_TL(), 2))
+        for x, y in combinations:
+            # x and y don't follow each other
+            if (x, y) not in follows and (y, x) not in follows:
+                # both (x,y) and (y,x) not added
+                if (x, y) not in pairs and (y, x) not in pairs:
+                    pairs.append((x, y))
+        return pairs
+
+        # This function returns a list of all causal pairs
+
+    # This function returns a list of all causal pairs
+    def give_causal_pairs(self):
+        pairs = list()
+        follows = self.follow_pairs
+        # create a list of permutations of all pairs of event names
+        permutations = list(itertools.permutations(self.step_1_TL(), 2))
+        for x, y in permutations:
+            if (x, y) in follows and (y, x) not in follows:
+                pairs.append((x, y))
+        return pairs
 
     # create a relation matrix storing relation status between all event pairs
     def give_relation_matrix(self):
@@ -82,36 +114,30 @@ class AlphaMiner(object):
         relations = dict()
         # create keys using event names as matrix rows
         for event_name in event_name_list:
-            # each column is an empty dict
+            # the value of each key is again a dictionary
             relations[event_name] = dict()
-            # in each column, define keys as event names again, and values as None
+            # at first, assign each record of matrix a none value.
             for e in event_name_list:
                 relations[event_name][e] = None
-        # Now record the event relations to according matrix elements
         # traverse matrix rows
         for row in relations.keys():
             # traverse matrix column
-            # print(f"row: {row}")
             for col in relations[row].keys():
-                # if this matrix element is not yet filled with any value
-                # print(f"col: {col}")
+                # we handle only records with none values
                 if relations[row][col] == None:
                     if row == col:
                         # relation between any event with itself is independent
                         relations[row][col] = "independent"
                     else:
-                        # if (row,col) and (col,row) are both None
-                        # print(f"row = {row}, col = {col}")
                         pair = (row, col)
-                        follow_list = self.follow_pairs
-                        if relations[row][col] == None and relations[col][row] == None:
-                            # if the pair shows causal relation
-                            # if pair in follow_list and pair[::-1] not in follow_list:
+                        # if for this pair no relations determined yet.
+                        if relations[col][row] == None:
+
+                            # if the pair is of causal relation
                             if pair in self.causal_pairs:
                                 relations[row][col] = "causal"
                                 relations[col][row] = "reverse-causal"
-                            # if the pair shows reverse-causal relation
-                            # elif pair not in follow_list and pair[::-1] in follow_list:
+                            # if the pair is of reverse-causal relation
                             elif pair[::-1] in self.causal_pairs:
                                 relations[row][col] = "reverse-causal"
                                 relations[col][row] = "causal"
@@ -124,70 +150,32 @@ class AlphaMiner(object):
                             else:
                                 relations[row][col] = "parallel"
                                 relations[col][row] = "parallel"
-                #else:
-                    #print(f"row = {row}, col = {col} : {relations[row][col]}")
         return relations
 
-
-    # Step4
-    # This function returns the relation status between 2 events
-    def get_relation_status_of(self, event_name1, event_name2):
-        return self.relations[event_name1][event_name2]
-
-    # This function returns a list of independent pairs
-    def give_independent_pairs(self):
-        pairs = list()
-        follows = self.follow_pairs
-        # create a list of combinations
-        combinations = list(itertools.combinations(self.step_1_TL(), 2))
-        for x, y in combinations:
-            if (x,y) not in follows and (y,x) not in follows:
-                if (x,y) not in pairs and (y,x) not in pairs:
-                    pairs.append((x, y))
-        return pairs
-
-    # This function returns a list of causal pairs
-    def give_causal_pairs(self):
-        pairs = list()
-        follows = self.follow_pairs
-        # create a list of permutations
-        permutations = itertools.permutations(self.step_1_TL(), 2)
-        for x, y in permutations:
-            if (x,y) in follows and (y,x) not in follows:
-                pairs.append((x,y))
-        return pairs
-
-    # This function returns left-causal elements of a certain event
-    def give_left_causal_elements(self, event_name):
-        result = list()
-        for x,y in self.causal_pairs:
-            if y == event_name:
-                list.append(x)
-        return result
-
-    # This function returns right-causal elements of a certain event
+    # This function returns all event names as second element in a follow relation to a certain event name
     def give_right_causal_elements(self, event_name):
-        result = list()
+        right_causals = list()
         for x,y in self.causal_pairs:
             if x == event_name:
-                result.append(y)
-        #print(f"so, the list of right causal elements of {event_name} is {result}")
-        return result
+                right_causals.append(y)
+        return right_causals
 
     # This function can check if an element can be added to an independent list, keeping
     # the list still remaining independent afterwards.
 
-    def can_add_keep_independent(self,event_name, list):
+    def can_add_keep_independent(self, event_name, list):
         if list == None:
             list = list()
+        # return false if event name already contained in list
         if event_name in list:
-            #print("event name already in list")
             return False
         else:
             for other_event_name in list:
+                # if other_event_name not in independent relation to a certain element in list.
                 if self.get_relation_status_of(event_name, other_event_name) != "independent":
                     return False
         return True
+
     # this function returns a power set of a given set of elements
     def powerset(self, iterable):
         result = list(chain.from_iterable(list(itertools.combinations(iterable, r) for r in range(len(iterable) + 1))))
@@ -198,12 +186,12 @@ class AlphaMiner(object):
 
     # this function checks if a given set of elements is independent (only holding elements independent from each other)
     def check_independence_set(self, iterable):
-        # iterable is pretty likely a tuple
+        # iterable is very likely a tuple
         l = iterable
-        # if iterable has 2 elements
+        # if iterable has only 2 elements
         if len(l) == 2:
             return self.get_relation_status_of(l[0], l[-1]) == "independent"
-        # else, iterable has more than 2 elements.
+        # else, iterable has more than 2 elements:
         pairs = itertools.combinations(l, r=2)
         for pair in pairs:
             if self.get_relation_status_of(pair[0],pair[-1]) != "independent":
@@ -376,7 +364,6 @@ class AlphaMiner(object):
     def step_7_FL(self):
         FL = []
         step_5_result = self.step_5_YL()
-        print(f" step 5 result: {step_5_result}")
         i = 1
         # traverse over list
         for tuple in step_5_result:
@@ -422,28 +409,25 @@ class AlphaMiner(object):
         # traverse over each flow
         for flow in flows:
             # if the left element in flow is a place node (its name starts with the character 'p')
-            print(f"for the flow {flow}:")
             # if one of 2 nodes of the flow is a source or sink node
             if flow[0] == 'iL':
                 # the left node is a source node, hence holds a circle shape
                 g.node(name=flow[0], shape='circle')
                 # the right node is a transition node, hence holds a square shape
-                g.node(name=flow[-1], shape='square')
+                g.node(name=flow[-1], shape='rect')
             elif flow[-1] == 'oL':
                 # the right node is a sink node, hence holds a circle shape
                 g.node(name=flow[-1], shape='circle')
                 # the left node is a transition node, hence holds a square shape
-                g.node(name=flow[0], shape='square')
+                g.node(name=flow[0], shape='rect')
             elif flow[0][0] == 'p' and len(flow[0]) == 2:
-                print(f"the left node is circle, the right is square.")
                 # the left node is a place node, hence holds a circle shape
                 g.node(name=flow[0], shape='circle')
                 # the right node is a transition node, hence holds a square shape
-                g.node(name=flow[-1], shape='square')
+                g.node(name=flow[-1], shape='rect')
             else:
-                print(f"the left node is square, the right is circle.")
                 # the left node is a transition node, hence holds a square shape
-                g.node(name=flow[0], shape='square')
+                g.node(name=flow[0], shape='rect')
                 # the right node is a place node, hence holds a circle shape
                 g.node(name=flow[-1], shape='circle')
             # relate 2 nodes above via an edge
@@ -455,13 +439,13 @@ class AlphaMiner(object):
 
 
 
-FILE_PATH = 'uploads/L1.xes'
+#FILE_PATH = 'uploads/L1.xes'
 #FILE_PATH = 'uploads/L2.xes'
 #FILE_PATH = 'uploads/L3.xes'
 #FILE_PATH = 'uploads/L4.xes'
-#FILE_PATH = 'uploads/L5.xes'
+FILE_PATH = 'uploads/L5.xes'
 #FILE_PATH = 'uploads/L6.xes'
-FILE_PATH = 'uploads/L7.xes'
+#FILE_PATH = 'uploads/L7.xes'
 #FILE_PATH = 'uploads/billinstances.xes'
 #FILE_PATH = 'uploads/flyerinstances.xes'
 #FILE_PATH = 'uploads/posterinstances.xes'
@@ -470,8 +454,4 @@ FILE_PATH = 'uploads/L7.xes'
 
 al_miner = AlphaMiner(FILE_PATH)
 
-#print(al_miner.step_4_XL())
-#print(al_miner.step_5_YL())
-
-print(f"step 7: {al_miner.step_7_FL()}")
 al_miner.draw_diagram()

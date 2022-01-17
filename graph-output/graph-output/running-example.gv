@@ -1,63 +1,63 @@
 digraph {
 	graph [rankdir=LR]
-	"register request" [shape=square]
+	"register request" [shape=rect]
 	p1 [shape=circle]
 	"register request" -> p1
 	p1 [shape=circle]
-	"check ticket" [shape=square]
+	"check ticket" [shape=rect]
 	p1 -> "check ticket"
-	"check ticket" [shape=square]
+	"check ticket" [shape=rect]
 	p2 [shape=circle]
 	"check ticket" -> p2
 	p2 [shape=circle]
-	decide [shape=square]
+	decide [shape=rect]
 	p2 -> decide
-	"reinitiate request" [shape=square]
+	"reinitiate request" [shape=rect]
 	p3 [shape=circle]
 	"reinitiate request" -> p3
 	p3 [shape=circle]
-	"check ticket" [shape=square]
+	"check ticket" [shape=rect]
 	p3 -> "check ticket"
-	decide [shape=square]
+	decide [shape=rect]
 	p4 [shape=circle]
 	decide -> p4
 	p4 [shape=circle]
-	"reinitiate request" [shape=square]
+	"reinitiate request" [shape=rect]
 	p4 -> "reinitiate request"
 	p4 [shape=circle]
-	"pay compensation" [shape=square]
+	"pay compensation" [shape=rect]
 	p4 -> "pay compensation"
 	p4 [shape=circle]
-	"reject request" [shape=square]
+	"reject request" [shape=rect]
 	p4 -> "reject request"
-	"register request" [shape=square]
+	"register request" [shape=rect]
 	p5 [shape=circle]
 	"register request" -> p5
-	"reinitiate request" [shape=square]
+	"reinitiate request" [shape=rect]
 	p5 [shape=circle]
 	"reinitiate request" -> p5
 	p5 [shape=circle]
-	"examine casually" [shape=square]
+	"examine casually" [shape=rect]
 	p5 -> "examine casually"
 	p5 [shape=circle]
-	"examine thoroughly" [shape=square]
+	"examine thoroughly" [shape=rect]
 	p5 -> "examine thoroughly"
-	"examine casually" [shape=square]
+	"examine casually" [shape=rect]
 	p6 [shape=circle]
 	"examine casually" -> p6
-	"examine thoroughly" [shape=square]
+	"examine thoroughly" [shape=rect]
 	p6 [shape=circle]
 	"examine thoroughly" -> p6
 	p6 [shape=circle]
-	decide [shape=square]
+	decide [shape=rect]
 	p6 -> decide
 	iL [shape=circle]
-	"register request" [shape=square]
+	"register request" [shape=rect]
 	iL -> "register request"
 	oL [shape=circle]
-	"pay compensation" [shape=square]
+	"pay compensation" [shape=rect]
 	"pay compensation" -> oL
 	oL [shape=circle]
-	"reject request" [shape=square]
+	"reject request" [shape=rect]
 	"reject request" -> oL
 }
