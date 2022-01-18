@@ -1,1 +1,0 @@
-document.getElementById("a_text").innerHTML = "Red lotus are attractive."

@@ -1,18 +1,21 @@
 digraph {
 	graph [rankdir=LR]
-	"deliver bill" [shape=square]
-	"print bill" [shape=square]
-	"write bill" [shape=square]
-	"print bill" [shape=circle]
-	"print bill" -> p1
+	"write bill" [shape=rect]
 	p1 [shape=circle]
-	p1 -> "deliver bill"
-	"write bill" [shape=circle]
-	"write bill" -> p2
+	"write bill" -> p1
+	p1 [shape=circle]
+	"print bill" [shape=rect]
+	p1 -> "print bill"
+	"print bill" [shape=rect]
 	p2 [shape=circle]
-	p2 -> "print bill"
-	iL [shape=circle]
-	iL -> "write bill"
-	"deliver bill" [shape=circle]
-	"deliver bill" -> oL
+	"print bill" -> p2
+	p2 [shape=circle]
+	"deliver bill" [shape=rect]
+	p2 -> "deliver bill"
+	start [shape=circle]
+	"write bill" [shape=rect]
+	start -> "write bill"
+	end [shape=circle]
+	"deliver bill" [shape=rect]
+	"deliver bill" -> end
 }

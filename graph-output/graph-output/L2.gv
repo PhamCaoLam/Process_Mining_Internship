@@ -4,42 +4,51 @@ digraph {
 	p1 [shape=circle]
 	a -> p1
 	p1 [shape=circle]
-	e [shape=rect]
-	p1 -> e
+	b [shape=rect]
+	p1 -> b
 	e [shape=rect]
 	p2 [shape=circle]
 	e -> p2
 	p2 [shape=circle]
 	f [shape=rect]
 	p2 -> f
-	c [shape=rect]
-	p3 [shape=circle]
-	c -> p3
-	p3 [shape=circle]
-	d [shape=rect]
-	p3 -> d
-	b [shape=rect]
-	p4 [shape=circle]
-	b -> p4
-	p4 [shape=circle]
-	c [shape=rect]
-	p4 -> c
-	p4 [shape=circle]
 	f [shape=rect]
-	p4 -> f
-	a [shape=rect]
-	p5 [shape=circle]
-	a -> p5
-	d [shape=rect]
-	p5 [shape=circle]
-	d -> p5
-	p5 [shape=circle]
+	p3 [shape=circle]
+	f -> p3
+	p3 [shape=circle]
 	b [shape=rect]
-	p5 -> b
+	p3 -> b
+	c [shape=rect]
+	p4 [shape=circle]
+	c -> p4
+	p4 [shape=circle]
+	d [shape=rect]
+	p4 -> d
+	p4 [shape=circle]
+	e [shape=rect]
+	p4 -> e
+	b [shape=rect]
+	p5 [shape=circle]
+	b -> p5
+	p5 [shape=circle]
+	d [shape=rect]
+	p5 -> d
+	p5 [shape=circle]
+	e [shape=rect]
+	p5 -> e
+	a [shape=rect]
+	p6 [shape=circle]
+	a -> p6
+	f [shape=rect]
+	p6 [shape=circle]
+	f -> p6
+	p6 [shape=circle]
+	c [shape=rect]
+	p6 -> c
 	start [shape=circle]
 	a [shape=rect]
 	start -> a
 	end [shape=circle]
-	f [shape=rect]
-	f -> end
+	d [shape=rect]
+	d -> end
 }

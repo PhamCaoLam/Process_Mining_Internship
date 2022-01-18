@@ -1,9 +1,7 @@
+import itertools
+from itertools import chain
 import graphviz
 import pm4py
-import itertools
-from itertools import chain, combinations
-from pm4py.objects.petri_net.obj import PetriNet, Marking
-
 
 
 class AlphaMiner(object):
@@ -34,7 +32,6 @@ class AlphaMiner(object):
                     TL.append(name)
         return TL
 
-
     # Step 2: returns names of all start nodes
     def step_2_TI(self):
         # create an empty set for start activities name
@@ -46,8 +43,6 @@ class AlphaMiner(object):
             if first_act not in start_acts:
                 start_acts.append(first_act)
         return start_acts
-
-
 
     # Step 3: returns names of all final activity nodes
     def step_3_TO(self):
@@ -162,7 +157,6 @@ class AlphaMiner(object):
 
     # This function can check if an element can be added to an independent list, keeping
     # the list still remaining independent afterwards.
-
     def can_add_keep_independent(self, event_name, list):
         if list == None:
             list = list()
@@ -176,22 +170,22 @@ class AlphaMiner(object):
                     return False
         return True
 
-    # this function returns a power set of a given set of elements
+    # this function returns a power set of a given set of elements (set of subsets)
     def powerset(self, iterable):
         result = list(chain.from_iterable(list(itertools.combinations(iterable, r) for r in range(len(iterable) + 1))))
+        # result is modified during loops
         for tuple in result[:]:
+        # filter out subsets with only one single element and the empty subset
             if len(tuple) < 2:
-                result.remove(tuple)
+               result.remove(tuple)
         return result
 
     # this function checks if a given set of elements is independent (only holding elements independent from each other)
-    def check_independence_set(self, iterable):
-        # iterable is very likely a tuple
-        l = iterable
-        # if iterable has only 2 elements
+    def check_independence_set(self, l):
+        # if iterable l has only 2 elements
         if len(l) == 2:
             return self.get_relation_status_of(l[0], l[-1]) == "independent"
-        # else, iterable has more than 2 elements:
+        # else, l has more than 2 elements:
         pairs = itertools.combinations(l, r=2)
         for pair in pairs:
             if self.get_relation_status_of(pair[0],pair[-1]) != "independent":
@@ -200,10 +194,10 @@ class AlphaMiner(object):
 
 
 # step 4, responsible for building up XL, which contains pairs of sets like (A,B), meeting 2 requirements:
-        # 1. All event names in one set (A or B) must be independent from each other.
-        # 2. Each event name in A must be in causal relation to each event name in B.
+        # 1. All event names within a set (A or B) must be independent from each other.
+        # 2. Every event name in A must be in causal relation to any event name in B.
     # step 4 is divided into 3 substeps:
-    # Substep a: builds pairs (A,B) with A and B having only one element.
+    # Substep a: builds pairs (A,B) with A and B each having only one element.
     # e.g: ({a},{c})
     def step_4_a(self):
         result = []
@@ -222,16 +216,14 @@ class AlphaMiner(object):
         result = []
         # take every event name from the log
         for x in self.event_name_list:
-            B = []
             # we build a set holding all right-causal elements of x
             right_causals = self.give_right_causal_elements(x)
-            # we build a power set of the right-causals set (without the empty subset
-            # and subsets that have only one element)
+            # we build a power set of the right-causals set
             powerset = self.powerset(right_causals)
             # traverse every subset in powerset:
             for subset in powerset:
                 # if all elements in the tuple are independent from each other:
-                if self.check_independence_set(subset) and subset not in B:
+                if self.check_independence_set(subset):
                     result.append(([x],list(subset)))
         return result
 
@@ -243,31 +235,20 @@ class AlphaMiner(object):
         independents = self.independent_pairs
         # for every independent pair
         for x, y in independents:
-            # print(f"no_name: consider independent pair ({x},{y})")
             A = []
             B = []
             # for every right-causal element of x
             for x_right in self.give_right_causal_elements(x):
-                # print(f"no_name: right_causal of {x} is {x_right}")
                 # if y -> x_right (causal)
                 if self.get_relation_status_of(y, x_right) == "causal":
-                    # print(f"{y} is also in causal relation with x_right = {x_right}")
                     # and if x_right not yet added to B as well as can be added to B, keeping B independent
                     if self.can_add_keep_independent(x_right, B):
                         B.append(x_right)
-                        # print(f"so, {x_right} has just been added to B")
-                # else:
-                # print(f"{y} and {x_right} not in causality")
-                # print(f"so now, B is {B}")
             # ultimately, we only add A,B to the result, if B is not empty
             if B:
-                # print(f"B is not empty: {B}")
-                # add x,y to A
                 A += [x, y]
-                # print("A is extended")
                 # add tuple of (A,B) to the result
                 result.append((A, B))
-                # print(f"(A,B) were added to the result. A = {A}, B = {B}")
         return result
 
     # this function merges all results from the 3 substeps above:
@@ -288,36 +269,27 @@ class AlphaMiner(object):
         result = self.step_4_XL()
         # traverse each pair (A,B)
         for A,B in result[:]:
-            # consider only the pair where A or B has more than 1 elements
+            # consider only pairs in which A or B has at least 2 elements
             if len(A) > 1 or len(B) > 1:
-                #print(f"(A,B) = {(A,B)} is considered: ")
                 # turn lists A,B into sets for easier handling
                 set_A = set(A)
                 set_B = set(B)
-                #print(f"set_A = {set_A}")
-                #print(f"set_B = {set_B}")
                 # traverse the list again and consider elements different from the above pair (A,B)
                 for _A,_B in result[:]:
                     # turn lists into sets
                     set__A = set(_A)
                     set__B = set(_B)
-                    #print(f"set__A = {set__A}")
-                    #print(f"set__B = {set__B}")
-                    #print(f"from current_result = {result}")
-                    # if the same element is being traversed
+                    # if the same element is being traversed, then skip to the next loop
                     if _A == A and _B == B:
-                        #print(f"the same element just traversed: {(_A,_B)} = {(A,B)} -> continue")
                         continue
+                    # if a subset is traversed, then remove it as not-maximal element
                     else:
                         if set__A.issubset(set_A) and set__B.issubset(set_B):
-                            #print(f"set__A = {set__A} is considered and is subset of set_A.")
-                            #print(f"set__B = {set__B} is considered and is subset of set_B.")
                             result.remove((_A,_B))
-                            #print(f"result after removing {_A} and {_B}: {result}")
         return result
 
 
-    # Step6: create and add places into between pairs of nodes.
+    # create names for place nodes
     def create_name_for_place_of(self, tuple_of_nodes):
         # the left side
         A = tuple_of_nodes[0]
@@ -331,7 +303,8 @@ class AlphaMiner(object):
         name = "P(" + left_name + "," + right_name + ")"
         return name
 
-    # return a list of all present place nodes consisting of initial and finishing places too.
+    # Step6: create and add places into between pairs of nodes.
+    # return a list of all present place nodes consisting of initial and final place too.
     def step_6_PL (self):
         step_5_result = self.step_5_YL()
         # an empty list holding all place nodes present
@@ -346,19 +319,6 @@ class AlphaMiner(object):
         PL.append('oL')
         return PL
 
-    # this functions maps each place name to a sign for easier specifications later
-    def map_place_names(self, places):
-        i = 1
-        modified_place_names = []
-        # traverse over each place name
-        for place in places:
-            if place[0] != 'i' and place[0] != 'o':
-                new_name = place[0] + str(i)
-                modified_place_names.append(new_name)
-                i = i + 1
-        return modified_place_names
-
-
     # Step7
     # now, we want to create pairs of event nodes and place nodes connected.
     def step_7_FL(self):
@@ -368,65 +328,68 @@ class AlphaMiner(object):
         # traverse over list
         for tuple in step_5_result:
             # the place
-            #place = self.create_name_for_place_of(tuple)
             place = f"p{i}"
-            i = i + 1
             # left element
             for ele in tuple[0]:
                 FL.append((ele, place))
             # right element
             for ele in tuple[-1]:
                 FL.append((place, ele))
+            i = i + 1
         # adding places connected with source and sink nodes
         source_nodes = self.step_2_TI()
         sink_nodes = self.step_3_TO()
+        # link start place with each source node
         for source in source_nodes:
-            FL.append(('iL', source))
+            FL.append(('start', source))
+        # link end place with each sink node
         for sink in sink_nodes:
-            FL.append((sink, 'oL'))
+            FL.append((sink, 'end'))
         return FL
 
 
-    # adding all TL, PL and FL together
+    # gather TL, PL and FL together
     # Step8
     def step_8(self):
         # all transitions
-        TL = self.step_1_TL()
+        TL = self.step_1_TL
         # all places
         PL = self.step_6_PL()
         # all flows (arcs)
         FL = self.step_7_FL()
         return (PL, TL, FL)
 
-    # we want to write a function that create pairs of event node and place node
+    # This function draws and returns a Petri net diagram
     def draw_diagram(self):
         # create a graph object with name of the file containing the diagram.
         g = graphviz.Digraph(filename='Petri_net_model', graph_attr={'rankdir': 'LR'})
 
-        # now, we create the edges between transition and place nodes:
+        # now, we create the edges between transition and place nodes
         # set of all present flows (arcs):
         flows = self.step_7_FL()
         # traverse over each flow
         for flow in flows:
-            # if the left element in flow is a place node (its name starts with the character 'p')
-            # if one of 2 nodes of the flow is a source or sink node
-            if flow[0] == 'iL':
-                # the left node is a source node, hence holds a circle shape
+            # if the first node of the flow is a source node
+            if flow[0] == 'start':
+                # the left node is a source node, hence has a circle shape
                 g.node(name=flow[0], shape='circle')
-                # the right node is a transition node, hence holds a square shape
+                # the right node is therefore a transition node, and has a rectangle shape
                 g.node(name=flow[-1], shape='rect')
-            elif flow[-1] == 'oL':
-                # the right node is a sink node, hence holds a circle shape
+            # if the right node of the flow is a sink node
+            elif flow[-1] == 'end':
+                # the right node is a sink node, hence has a circle shape
                 g.node(name=flow[-1], shape='circle')
-                # the left node is a transition node, hence holds a square shape
+                # the left node is therefore a transition node, hence has a rectangle shape
                 g.node(name=flow[0], shape='rect')
+            # if the left element in a flow is a normal place node
+            # (its name must start with the character 'p' and have only 2 characters)
             elif flow[0][0] == 'p' and len(flow[0]) == 2:
                 # the left node is a place node, hence holds a circle shape
                 g.node(name=flow[0], shape='circle')
-                # the right node is a transition node, hence holds a square shape
+                # the right node is a transition node, hence holds a rectangle shape
                 g.node(name=flow[-1], shape='rect')
             else:
-                # the left node is a transition node, hence holds a square shape
+                # the left node is a transition node, hence holds a rectangle shape
                 g.node(name=flow[0], shape='rect')
                 # the right node is a place node, hence holds a circle shape
                 g.node(name=flow[-1], shape='circle')
@@ -434,16 +397,14 @@ class AlphaMiner(object):
             g.edge(tail_name=f"{flow[0]}", head_name=f'{flow[-1]}')
 
         # output the diagram to a file called filename and specify the directory where it is located.
-        g.render(view=True, directory='graph-output', format='png', outfile=f'graph-output/{self.filename_without_extension}.png')
+        g.render(directory='graph-output', format='pdf', outfile=f'graph-output/{self.filename_without_extension}.pdf')
 
 
-
-
-#FILE_PATH = 'uploads/L1.xes'
+FILE_PATH = 'uploads/L1.xes'
 #FILE_PATH = 'uploads/L2.xes'
 #FILE_PATH = 'uploads/L3.xes'
 #FILE_PATH = 'uploads/L4.xes'
-FILE_PATH = 'uploads/L5.xes'
+#FILE_PATH = 'uploads/L5.xes'
 #FILE_PATH = 'uploads/L6.xes'
 #FILE_PATH = 'uploads/L7.xes'
 #FILE_PATH = 'uploads/billinstances.xes'
@@ -453,5 +414,4 @@ FILE_PATH = 'uploads/L5.xes'
 
 
 al_miner = AlphaMiner(FILE_PATH)
-
 al_miner.draw_diagram()

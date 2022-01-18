@@ -30,7 +30,7 @@ for _place in al.step_6_PL():
 
 # Create transitions
 # t_1 = PetriNet.Transition("name_1", "label_1")
-for transition in al.step_1_TL():
+for transition in al.step_1_TL:
     net.transitions.add(PetriNet.Transition(f"{transition}", f"{transition}"))
 
 

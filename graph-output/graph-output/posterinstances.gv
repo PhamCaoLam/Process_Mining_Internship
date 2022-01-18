@@ -18,10 +18,10 @@ digraph {
 	p3 [shape=circle]
 	"deliver poster" [shape=rect]
 	p3 -> "deliver poster"
-	iL [shape=circle]
+	start [shape=circle]
 	"receive order and photo" [shape=rect]
-	iL -> "receive order and photo"
-	oL [shape=circle]
+	start -> "receive order and photo"
+	end [shape=circle]
 	"deliver poster" [shape=rect]
-	"deliver poster" -> oL
+	"deliver poster" -> end
 }

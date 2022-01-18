@@ -51,13 +51,13 @@ digraph {
 	p6 [shape=circle]
 	decide [shape=rect]
 	p6 -> decide
-	iL [shape=circle]
+	start [shape=circle]
 	"register request" [shape=rect]
-	iL -> "register request"
-	oL [shape=circle]
+	start -> "register request"
+	end [shape=circle]
 	"pay compensation" [shape=rect]
-	"pay compensation" -> oL
-	oL [shape=circle]
+	"pay compensation" -> end
+	end [shape=circle]
 	"reject request" [shape=rect]
-	"reject request" -> oL
+	"reject request" -> end
 }

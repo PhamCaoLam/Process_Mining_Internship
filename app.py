@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from main import AlphaMiner
 
 app = Flask(__name__)
-app.config['UPLOAD_EXTENSIONS'] = ['.xes', '.jpeg']
+app.config['UPLOAD_EXTENSIONS'] = ['.xes']
 app.config['UPLOAD_PATH'] = 'uploads'   # uploads is the directory name, UPLOAD_PATH is the variable
 app.config['DOWNLOAD_PATH'] = 'graph-output'
 
@@ -28,7 +28,7 @@ def index():
             al_miner = AlphaMiner(file_path)
             # al_miner draws the model and output it to a file.
             al_miner.draw_diagram()
-            model_file_path = app.config['DOWNLOAD_PATH'] + f"/{al_miner.filename_without_extension}.png"
+            model_file_path = app.config['DOWNLOAD_PATH'] + f"/{al_miner.filename_without_extension}.pdf"
 
             return render_template('upload_state_and_download.html', file_path = model_file_path)
     return render_template('index.html')
@@ -36,7 +36,6 @@ def index():
 @app.route('/display/<path:filepath>')
 def display(filepath):
     return send_file(filepath)
-
 
 @app.route('/download/<path:filepath>')
 def download(filepath):
